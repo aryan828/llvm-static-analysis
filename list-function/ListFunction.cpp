@@ -14,9 +14,11 @@ struct ListFunctionResult {
 
 struct ListFunction : public AnalysisInfoMixin<ListFunction> {
 	using Result = ListFunctionResult;
-	ListFunctionResult run (Function &F, FunctionAnalysisManager &) {
+
+	Result run (Function &F, FunctionAnalysisManager &) {
 		return {F.getName().data(), F.arg_size(), F.size(), F.getInstructionCount()};
 	}
+
 	static bool isRequired() { return true; }
 
 private:
@@ -27,6 +29,7 @@ private:
 class ListFunctionPrinter : public PassInfoMixin<ListFunctionPrinter> {
 public:
 	explicit ListFunctionPrinter(raw_ostream &OS) : OS(OS) {}
+
 	PreservedAnalyses run(Function &Func, FunctionAnalysisManager &FAM) {
 		auto &LFR = FAM.getResult<ListFunction>(Func);
 		const char* name = "NAME";
@@ -39,6 +42,7 @@ public:
 		OS << "---------------------------------------------------------------------------\n";
 		return PreservedAnalyses::all();
 	}
+
 	static bool isRequired() { return true; }
 
 private:
@@ -72,7 +76,7 @@ PassPluginLibraryInfo getListFunctionPluginInfo() {
 
 }
 
-extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+extern "C" LLVM_ATTRIBUTE_WEAK::PassPluginLibraryInfo
 llvmGetPassPluginInfo() {
 	return getListFunctionPluginInfo();
 }
